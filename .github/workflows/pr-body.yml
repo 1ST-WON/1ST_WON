@@ -1,0 +1,51 @@
+name: pr-body
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+permissions:
+  pull-requests: read
+jobs:
+  pr-body:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const errors = [];
+
+            const field = (label) => {
+              const line = body.split('\n').find((l) => l.includes(label));
+              if (!line) return null;
+              return line.split(':').slice(1).join(':').trim();
+            };
+            const tool = field('사용 도구');
+            if (!tool || tool === 'Claude Code / Codex / 없음') {
+              errors.push('AI 사용 칸: "사용 도구"를 실제로 쓴 도구(또는 "없음")로 고쳐 주세요.');
+            }
+            const isNone = tool === '없음';
+            if (!isNone) {
+              if (!field('AI가 만든 부분')) errors.push('AI 사용 칸: "AI가 만든 부분"이 비어 있습니다.');
+              if (!field('내가 직접 한 줄씩 확인한 부분')) errors.push('AI 사용 칸: "내가 직접 한 줄씩 확인한 부분"이 비어 있습니다.');
+            }
+
+            // TODO(mock 피드백): 노션은 "체크 안 된 항목"이라고만 함. 여기서는 "체크리스트" 절만 검사하고
+            // "어떻게 확인했나"는 검사하지 않음(설정 파일 PR에는 해당 없음, 피드백 DB 항목 참고).
+            const start = body.indexOf('## 체크리스트');
+            if (start === -1) {
+              errors.push('"## 체크리스트" 절이 없습니다. PR 템플릿을 지우지 마세요.');
+            } else {
+              const rest = body.slice(start);
+              const next = rest.indexOf('\n## ', 1);
+              const section = next === -1 ? rest : rest.slice(0, next);
+              const unchecked = section.split('\n').filter((l) => /^\s*-\s\[\s\]/.test(l));
+              if (unchecked.length > 0) {
+                errors.push(`체크리스트에 체크 안 된 항목이 ${unchecked.length}개 있습니다:\n${unchecked.join('\n')}`);
+              }
+            }
+
+            if (!/Closes\s+#\d+/i.test(body)) {
+              errors.push('"Closes #이슈번호"가 없습니다.');
+            }
+
+            if (errors.length > 0) core.setFailed(errors.join('\n'));
