@@ -16,3 +16,6 @@ contracts/cache/
 
 # OS
 .DS_Store
+
+# IDE 설정 (TODO(mock 피드백): 노션 .gitignore 목록에 없음)
+.idea/
