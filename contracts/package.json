@@ -1,0 +1,11 @@
+{
+  "name": "@won-coin-mock/contracts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile"
+  },
+  "devDependencies": {
+    "hardhat": "3.22.0"
+  }
+}

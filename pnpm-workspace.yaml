@@ -3,3 +3,5 @@
 packages:
   - frontend
   - contracts
+allowBuilds:
+  esbuild: true
