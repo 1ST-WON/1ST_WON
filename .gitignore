@@ -1,0 +1,18 @@
+# 노션에 흩어진 항목을 모음 (TODO(mock 피드백): 전체 목록은 노션에 없음)
+# 비밀값 (Code Convention 4절 .env)
+.env
+.env.*
+!.env.example
+
+# 의존성 (TODO: 노션에 없음, pnpm 기본)
+node_modules/
+
+# Hardhat 결과물 (Code Convention 4절 ABI 파일: artifacts/ 커밋 안 함)
+contracts/artifacts/
+contracts/cache/
+
+# Web3j 래퍼 생성 폴더 (Code Convention 2절: 커밋 안 함. 정확한 경로는 PR D에서 정함)
+# TODO: backend/build/generated/... 경로 확정 후 추가
+
+# OS
+.DS_Store
