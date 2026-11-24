@@ -1,0 +1,73 @@
+name: pending-checks
+# 검사할 파일이 아직 없어 미뤄 둔 검사(ADR-81)를 잊지 않도록, 대상 파일이 처음 들어오면 PR에 알림 댓글을 단다.
+# 머지는 막지 않는다. 필수 체크에도 넣지 않는다.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  pending-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+
+            const PENDING = [
+              { label: 'Dockerfile', issue: '28', checks: 'hadolint',
+                match: (f) => path.basename(f) === 'Dockerfile', doneWord: 'hadolint' },
+              { label: 'DB 마이그레이션', issue: '29', checks: 'SQLFluff, 마이그레이션 수정 금지·순서, 위험 SQL 경고',
+                match: (f) => f.startsWith('backend/src/main/resources/db/migration/') && f.endsWith('.sql'), doneWord: 'sqlfluff' },
+              { label: '백엔드 코드', issue: '30', checks: 'ArchUnit(금액 타입·레이어), JaCoCo',
+                match: (f) => f.startsWith('backend/src/main/java/'), doneWord: 'archunit' },
+              { label: 'API 명세(springdoc)', issue: '31', checks: 'openapi.json 최신 검사',
+                match: (f, patch) => f === 'backend/build.gradle.kts' && /springdoc/.test(patch ?? ''), doneWord: 'openapi.json' },
+              { label: 'Solidity', issue: '32', checks: 'EVM 일치 + Besu 실배포, Slither, solhint',
+                match: (f) => f.startsWith('contracts/') && f.endsWith('.sol'), doneWord: 'slither' },
+            ];
+
+            // 검사가 이미 추가됐는지는 워크플로와 백엔드 빌드 설정에 도구 이름이 있는지로 본다. 추가되면 알림이 저절로 멈춘다.
+            const workflowFiles = fs.readdirSync('.github/workflows')
+              .filter((name) => name !== 'pending-checks.yml')
+              .map((name) => path.join('.github/workflows', name));
+            const buildFiles = ['backend/build.gradle.kts', 'backend/gradle/libs.versions.toml'].filter((f) => fs.existsSync(f));
+            const workflowText = [...workflowFiles, ...buildFiles]
+              .map((f) => fs.readFileSync(f, 'utf8').toLowerCase())
+              .join('\n');
+
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pr.number });
+
+            const missing = PENDING.filter((p) => !workflowText.includes(p.doneWord.toLowerCase()))
+              .map((p) => ({ ...p, hits: files.filter((f) => p.match(f.filename, f.patch)).map((f) => f.filename) }))
+              .filter((p) => p.hits.length > 0);
+
+            const MARKER = '<!-- pending-checks -->';
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number });
+            const existing = comments.find((c) => c.body?.includes(MARKER));
+
+            if (missing.length === 0) {
+              core.info('미뤄 둔 검사와 관련된 파일 없음');
+              return;
+            }
+
+            const lines = missing.map((p) => `- **${p.label}** (${p.hits.slice(0, 3).join(', ')}${p.hits.length > 3 ? ' …' : ''}) → ${p.checks} 추가 필요 (#${p.issue})`);
+            const body = [
+              MARKER,
+              '🔔 이 PR에 아래 검사의 대상 파일이 들어왔어요. 검사는 아직 만들지 않았습니다.',
+              ...lines,
+              '',
+              '머지는 막지 않습니다. 담당자는 이번 PR이나 바로 다음 PR에서 검사를 추가해 주세요. (Code Convention 4절 "자동 검사 위치", ADR-37, ADR-81)',
+            ].join('\n');
+
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            }
