@@ -6,6 +6,7 @@
     "compile": "hardhat compile"
   },
   "devDependencies": {
-    "hardhat": "3.22.0"
+    "hardhat": "3.22.0",
+    "solhint": "^6.2.5"
   }
 }
