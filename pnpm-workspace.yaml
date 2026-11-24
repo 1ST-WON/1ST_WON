@@ -5,3 +5,7 @@ packages:
   - contracts
 allowBuilds:
   esbuild: true
+# Node가 .nvmrc(package.json engines)와 다르면 설치를 실패시킨다 (ADR-7 보충, ADR-80).
+engineStrict: true
+# Mac·Windows에서 같은 pnpm 명령이 같은 셸 문법으로 돌게 한다.
+shellEmulator: true

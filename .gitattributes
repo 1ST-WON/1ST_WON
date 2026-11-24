@@ -1,0 +1,7 @@
+# Windows 팀원이 있어도 저장소의 줄바꿈은 LF로 통일한다. .bat/.cmd만 Windows용이라 CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.jar binary
+*.png binary
+*.ico binary

@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:18
+    image: postgres:18.7
     environment:
       POSTGRES_DB: ${DB_NAME:-woncoin}
       POSTGRES_USER: ${DB_USER:-woncoin}
