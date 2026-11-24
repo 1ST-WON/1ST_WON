@@ -5,6 +5,7 @@
 ## 구조
 - src/app 은 얇게(주소별 화면 조립만). 기능은 src/features/{기능}/(components, hooks, api).
 - 공통은 src/shared (UI, lib/money.ts).
+- 화면 3개는 앱 하나에서 주소로 나눈다: src/app/broker(증권사), src/app/issuer(사장님·발행사), src/app/investor(투자자, 반응형 웹). apps/ 폴더나 새 앱을 만들지 않는다. 모바일 앱은 없다(ADR-79).
 
 ## 서버 컴포넌트
 - 기본은 서버 컴포넌트. 'use client'는 클릭·입력이 필요한 가장 작은 컴포넌트에만.
