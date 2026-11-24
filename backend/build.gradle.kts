@@ -8,6 +8,7 @@ plugins {
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(libs.versions.java.get())
+        vendor = JvmVendorSpec.ADOPTIUM
     }
 }
 
