@@ -55,10 +55,16 @@
 
 ## 명령어
 
-<!-- 7단계 mock에서 실제 명령으로 채운다 -->
+- 작업 전에 pnpm check-env 를 실행한다. 하나라도 ❌이면 멈추고 사람에게 알린다.
+- 아래 pnpm 명령만 쓴다. gradlew, docker compose, npx를 직접 부르지 않는다.
+- git 명령(switch, commit, push)은 사람이 일반 터미널에서 한다.
 - 설치: pnpm install (저장소 루트, 커밋 검사 도구 포함)
-- 로컬 실행: docker compose -f infra/docker-compose.yml up
-- 마이그레이션 파일 생성: pnpm db:new
+- 로컬 DB·Besu: pnpm infra:up / pnpm infra:down (루트 .env 필요)
+- 프런트: pnpm fe:dev / pnpm fe:lint / pnpm fe:typecheck / pnpm fe:build
+- 백엔드: pnpm be:run / pnpm be:build (포맷 검사·테스트 포함)
+- 컨트랙트: pnpm ct:compile
+- 포맷: pnpm format / pnpm format:check
+- 마이그레이션 파일 생성: pnpm db:new (TODO: 아직 없음. 첫 마이그레이션 때 만든다, 이슈 #29)
 
 ## 커밋·PR
 
