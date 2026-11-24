@@ -11,6 +11,8 @@
   "scripts": {
     "prepare": "husky",
     "check-env": "node scripts/doctor.mjs",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,cjs,css,sol}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,css,sol}\"",
     "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d",
     "infra:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
     "fe:dev": "pnpm --filter frontend dev",
@@ -24,6 +26,9 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.2",
+    "prettier": "^3.10.1",
+    "prettier-plugin-solidity": "^2.4.1"
   }
 }

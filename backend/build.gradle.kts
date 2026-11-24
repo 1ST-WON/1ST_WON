@@ -3,6 +3,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 plugins {
     java
     alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spotless)
 }
 
 java {
@@ -14,6 +15,12 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
 }
 
 dependencies {
