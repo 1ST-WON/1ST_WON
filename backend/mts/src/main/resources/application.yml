@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: won-mts
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:woncoin}?currentSchema=mts
+    username: ${MTS_DB_USER:mts_user}
+    password: ${MTS_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: ${MTS_PORT:8083}

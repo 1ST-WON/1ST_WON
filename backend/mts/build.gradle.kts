@@ -1,0 +1,3 @@
+﻿dependencies {
+    // MTS-specific dependencies
+}
