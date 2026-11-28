@@ -10,11 +10,16 @@ export default (files) => {
     commands.push(`prettier --write --ignore-unknown ${quote(formattable)}`);
   }
 
-  const frontendCode = pick(/[\\/]frontend[\\/].*\.(tsx?|[cm]?js)$/);
-  if (frontendCode.length > 0) {
-    commands.push(
-      `pnpm --filter frontend exec eslint --fix ${quote(frontendCode)}`,
+  for (const service of ["issuer", "broker", "mts"]) {
+    const frontendCode = pick(
+      new RegExp(`[\\\\/]frontend[\\\\/]${service}[\\\\/].*\\.(tsx?|[cm]?js)$`),
     );
+
+    if (frontendCode.length > 0) {
+      commands.push(
+        `pnpm --filter ./frontend/${service} exec eslint --fix ${quote(frontendCode)}`,
+      );
+    }
   }
 
   const solidity = pick(/[\\/]contracts[\\/].*\.sol$/);
