@@ -1,0 +1,3 @@
+﻿dependencies {
+    // Broker-specific dependencies
+}

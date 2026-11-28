@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: won-issuer
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:woncoin}?currentSchema=issuer
+    username: ${ISSUER_DB_USER:issuer_user}
+    password: ${ISSUER_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: ${ISSUER_PORT:8081}

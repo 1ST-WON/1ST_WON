@@ -1,0 +1,80 @@
+services:
+  issuer:
+    image: won-issuer:local
+    build:
+      context: ../backend/issuer
+      dockerfile: Dockerfile
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-woncoin}
+
+      ISSUER_DB_USER: ${ISSUER_DB_USER:-issuer_user}
+      ISSUER_DB_PASSWORD: ${ISSUER_DB_PASSWORD:?ISSUER_DB_PASSWORD is required}
+
+      ISSUER_PORT: "8081"
+      BROKER_API_URL: http://broker:8082
+      JWT_SECRET: ${JWT_SECRET:-}
+
+    ports:
+      - "127.0.0.1:${ISSUER_PORT:-8081}:8081"
+
+  broker:
+    image: won-broker:local
+    build:
+      context: ../backend/broker
+      dockerfile: Dockerfile
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-woncoin}
+
+      BROKER_DB_USER: ${BROKER_DB_USER:-broker_user}
+      BROKER_DB_PASSWORD: ${BROKER_DB_PASSWORD:?BROKER_DB_PASSWORD is required}
+
+      BROKER_PORT: "8082"
+      ISSUER_API_URL: http://issuer:8081
+      MTS_API_URL: http://mts:8083
+      JWT_SECRET: ${JWT_SECRET:-}
+
+      BLOCKCHAIN_RPC_URL: ${BLOCKCHAIN_RPC_URL:-}
+      BLOCKCHAIN_CHAIN_ID: ${BLOCKCHAIN_CHAIN_ID:-}
+      BLOCKCHAIN_CONTRACT_ADDRESS: ${BLOCKCHAIN_CONTRACT_ADDRESS:-}
+
+    ports:
+      - "127.0.0.1:${BROKER_PORT:-8082}:8082"
+
+  mts:
+    image: won-mts:local
+    build:
+      context: ../backend/mts
+      dockerfile: Dockerfile
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-woncoin}
+
+      MTS_DB_USER: ${MTS_DB_USER:-mts_user}
+      MTS_DB_PASSWORD: ${MTS_DB_PASSWORD:?MTS_DB_PASSWORD is required}
+
+      MTS_PORT: "8083"
+      BROKER_API_URL: http://broker:8082
+      JWT_SECRET: ${JWT_SECRET:-}
+
+    ports:
+      - "127.0.0.1:${MTS_PORT:-8083}:8083"

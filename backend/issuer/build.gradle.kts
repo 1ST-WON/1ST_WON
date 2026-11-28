@@ -1,0 +1,3 @@
+﻿dependencies {
+    // Issuer-specific dependencies
+}

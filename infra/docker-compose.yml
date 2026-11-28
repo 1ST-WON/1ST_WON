@@ -5,44 +5,54 @@ services:
       POSTGRES_DB: ${DB_NAME:-woncoin}
       POSTGRES_USER: ${DB_USER:-woncoin}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+
+      ISSUER_DB_USER: ${ISSUER_DB_USER:-issuer_user}
+      ISSUER_DB_PASSWORD: ${ISSUER_DB_PASSWORD:?ISSUER_DB_PASSWORD is required}
+
+      BROKER_DB_USER: ${BROKER_DB_USER:-broker_user}
+      BROKER_DB_PASSWORD: ${BROKER_DB_PASSWORD:?BROKER_DB_PASSWORD is required}
+
+      MTS_DB_USER: ${MTS_DB_USER:-mts_user}
+      MTS_DB_PASSWORD: ${MTS_DB_PASSWORD:?MTS_DB_PASSWORD is required}
+
+      MIGRATION_DB_USER: ${MIGRATION_DB_USER:-migration_user}
+      MIGRATION_DB_PASSWORD: ${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD is required}
+
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
+
     volumes:
       - postgres-data:/var/lib/postgresql
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 3s
       retries: 12
 
-  # TODO: ADR에서 chainId 확정 전까지 genesis.json은 임시 값 1337을 쓴다.
-  besu:
-    image: hyperledger/besu:26.11.1
-    entrypoint: ["/bin/sh", "-ec"]
-    command:
-      - |
-        # 로컬에서만 쓰는 공개 테스트 키로 검증자 주소를 고정한다.
-        if [ ! -f /var/lib/besu/local-test.key ]; then
-          umask 077
-          printf '%064d' 1 > /var/lib/besu/local-test.key
-        fi
-        exec /opt/besu/bin/besu \
-          --data-path=/var/lib/besu \
-          --node-private-key-file=/var/lib/besu/local-test.key \
-          --genesis-file=/config/genesis.json \
-          --sync-mode=FULL \
-          --discovery-enabled=false \
-          --min-gas-price=0 \
-          --rpc-http-enabled=true \
-          --rpc-http-host=0.0.0.0 \
-          --rpc-http-api=ETH,NET,WEB3,QBFT \
-          --host-allowlist=localhost,127.0.0.1
-    ports:
-      - "127.0.0.1:8545:8545"
+  flyway:
+    image: redgate/flyway:12.4.0
+
+    profiles:
+      - migration
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-woncoin}
+      FLYWAY_USER: ${MIGRATION_DB_USER:-migration_user}
+      FLYWAY_PASSWORD: ${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD is required}
+      FLYWAY_OUT_OF_ORDER: "true"
+
     volumes:
-      - ./besu/genesis.json:/config/genesis.json:ro
-      - besu-data:/var/lib/besu
+      - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf:ro
+      - ./flyway/sql:/flyway/sql:ro
+
+    command: migrate
+    restart: "no"
 
 volumes:
   postgres-data:
-  besu-data:

@@ -22,12 +22,12 @@ jobs:
               { label: 'Dockerfile', issue: '28', checks: 'hadolint',
                 match: (f) => path.basename(f) === 'Dockerfile', doneWord: 'hadolint' },
               { label: 'DB 마이그레이션', issue: '29', checks: 'SQLFluff, 마이그레이션 수정 금지·순서, 위험 SQL 경고',
-                match: (f) => f.startsWith('backend/src/main/resources/db/migration/') && f.endsWith('.sql'), doneWord: 'sqlfluff' },
+                match: (f) => f.startsWith('infra/flyway/sql/') && f.endsWith('.sql'), doneWord: 'sqlfluff' },
               { label: '백엔드 코드', issue: '30', checks: 'ArchUnit(금액 타입·레이어), JaCoCo',
-                match: (f) => f.startsWith('backend/src/main/java/'), doneWord: 'archunit' },
+                match: (f) => /^backend\/(issuer|broker|mts)\/src\/main\/java\//.test(f), doneWord: 'archunit' },
               { label: 'API 명세(springdoc)', issue: '31', checks: 'openapi.json 최신 검사',
-                match: (f, patch) => f === 'backend/build.gradle.kts' && /springdoc/.test(patch ?? ''), doneWord: 'openapi.json' },
-              { label: 'Solidity', issue: '32', checks: 'EVM 일치 + Besu 실배포, Slither, solhint',
+                match: (f, patch) => /^backend\/(?:(issuer|broker|mts)\/)?build\.gradle\.kts$/.test(f) && /springdoc/.test(patch ?? ''), doneWord: 'openapi.json' },
+              { label: 'Solidity', issue: '32', checks: 'EVM 호환성 + 테스트넷 배포 검증, Slither, solhint',
                 match: (f) => f.startsWith('contracts/') && f.endsWith('.sol'), doneWord: 'slither' },
             ];
 

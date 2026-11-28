@@ -16,7 +16,7 @@ jobs:
         with:
           script: |
             // TODO(mock 피드백): "보안 설정" 경로가 노션에 없어 컨트랙트·마이그레이션만 검사
-            const SENSITIVE = ['contracts/', 'backend/src/main/resources/db/migration/'];
+            const SENSITIVE = ['contracts/', 'infra/flyway/sql/'];
             const pr = context.payload.pull_request;
             const { owner, repo } = context.repo;
 
