@@ -7,6 +7,14 @@
 # 의존성 (TODO: 노션에 없음, pnpm 기본)
 node_modules/
 
+# Frontend - Next.js
+frontend/**/.next/
+frontend/**/out/
+frontend/**/next-env.d.ts
+
+# TypeScript build cache
+*.tsbuildinfo
+
 # Hardhat 결과물 (Code Convention 4절 ABI 파일: artifacts/ 커밋 안 함)
 contracts/artifacts/
 contracts/cache/
