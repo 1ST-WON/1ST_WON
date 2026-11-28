@@ -1,0 +1,37 @@
+# Dependencies
+**/node_modules
+**/.pnpm-store
+**/.pnp
+**/.pnp.*
+
+# Build outputs
+**/.next
+**/out
+**/build
+**/dist
+**/coverage
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# Environment variables and secrets
+**/.env*
+**/*.pem
+**/*.key
+**/.npmrc
+
+# Git
+.git
+**/.git
+
+# Logs
+**/*.log
+
+# IDE and OS
+**/.DS_Store
+**/.vscode
+**/.idea
+**/.vercel
+
+# Unnecessary directories
+backend/
+infra/

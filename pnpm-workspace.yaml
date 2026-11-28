@@ -1,7 +1,9 @@
 # TODO(mock 피드백): 노션에 워크스페이스 구성이 없어 진행자가 임시로 작성.
 # pnpm을 쓰는 폴더만 넣음(ADR-10 모노레포, ADR-8 pnpm, ADR-31 Hardhat). backend는 Gradle이라 제외.
 packages:
-  - frontend
+  - frontend/issuer
+  - frontend/broker
+  - frontend/mts
   - contracts
 allowBuilds:
   esbuild: true
