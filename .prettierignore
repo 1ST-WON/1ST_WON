@@ -1,6 +1,6 @@
 **/node_modules
-frontend/.next
-frontend/next-env.d.ts
+frontend/**/.next
+frontend/**/next-env.d.ts
 contracts/artifacts
 contracts/cache
 backend
