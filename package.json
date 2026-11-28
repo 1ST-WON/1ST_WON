@@ -39,7 +39,11 @@
     "be:test": "node scripts/gradle.mjs :issuer:test :broker:test :mts:test",
     "be:lint": "node scripts/gradle.mjs :issuer:spotlessCheck :broker:spotlessCheck :mts:spotlessCheck",
     "be:format": "node scripts/gradle.mjs :issuer:spotlessApply :broker:spotlessApply :mts:spotlessApply",
-    "ct:compile": "pnpm --filter ./contracts compile"
+    "ct:compile": "pnpm --filter ./contracts compile",
+    "ct:test": "pnpm --filter ./contracts test",
+    "ct:lint": "pnpm --filter ./contracts lint",
+    "ct:account": "node scripts/sepolia-account.mjs",
+    "ct:rpc": "node scripts/sepolia-check.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
